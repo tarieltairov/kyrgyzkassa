@@ -28,6 +28,8 @@ const addNewUser = async (chatId) => {
     currentStep: 0,
     replenishmentAmount: "",
     accountId: "",
+    isFullAccountId: false,
+    isPaid: false,
     screenshot: null,
   };
   userInfo.push(newUserInfo);
@@ -78,8 +80,9 @@ bot.on("message", async (msg) => {
       return bot.sendMessage(chatId, MESSAGE.ACCOUNT_ID);
     }
 
-    if (foundUser.currentStep === 2) {
+    if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
       foundUser.accountId = text;
+      foundUser.isFullAccountId = true;
       return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
     }
 
@@ -91,6 +94,9 @@ bot.on("message", async (msg) => {
       } else {
         return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
       }
+    }
+    if (!foundUser.isPaid && foundUser.currentStep === 2) {
+      return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
     }
   }
 
@@ -127,6 +133,8 @@ bot.on("callback_query", async (msg) => {
   }
 
   if (data === btnType.paid) {
+    const foundUser = userInfo.find((item) => item.chatId === chatId);
+    foundUser.isPaid = true;
     udpatedSteps(chatId);
     await bot.deleteMessage(chatId, messageId);
     return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
