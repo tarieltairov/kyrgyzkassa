@@ -1,6 +1,5 @@
 const { bot } = require("../../botConfig");
 
-
 const sendPhotoToChat = async (groupId, screenshot) => {
   try {
     if (Array.isArray(screenshot)) {
@@ -13,8 +12,13 @@ const sendPhotoToChat = async (groupId, screenshot) => {
   }
 };
 
-
+const checkNeedSum = (str) => {
+  const checkFullNumber = /^\d+$/.test(str);
+  if (checkFullNumber) return Number(str) > 50;
+  return false;
+};
 
 module.exports = {
   sendPhotoToChat,
+  checkNeedSum
 };

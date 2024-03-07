@@ -10,7 +10,7 @@ const {
   replacementOptions,
   paymentOptions,
 } = require("./common/constants/options");
-const { sendPhotoToChat } = require("./common/helpers");
+const { sendPhotoToChat, checkNeedSum } = require("./common/helpers");
 
 console.log("Bot has been started!");
 bot.setMyCommands(commandsBtns);
@@ -75,9 +75,13 @@ bot.on("message", async (msg) => {
 
   if (foundUser) {
     if (foundUser.currentStep === 1) {
-      foundUser.replenishmentAmount = text;
-      await udpatedSteps(chatId);
-      return bot.sendMessage(chatId, MESSAGE.ACCOUNT_ID);
+      if (checkNeedSum(text)) {
+        foundUser.replenishmentAmount = text;
+        await udpatedSteps(chatId);
+        return bot.sendMessage(chatId, MESSAGE.ACCOUNT_ID);
+      } else {
+        return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
+      }
     }
 
     if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
