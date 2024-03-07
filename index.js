@@ -1,47 +1,40 @@
-const TelegramApi = require("node-telegram-bot-api");
+const { bot, groupId } = require("./botConfig");
 const {
   commandsBtns,
   commandsValues,
-  message,
+  btnType,
 } = require("./common/constants/commands");
+const { MESSAGE } = require("./common/constants/message");
 const {
   startOptions,
   replacementOptions,
   paymentOptions,
 } = require("./common/constants/options");
+const { sendPhotoToChat } = require("./common/helpers");
 
-const token = "7040341581:AAEWqVvHe00KWU9-jIvFsUZwKUmT6tebS3A";
-const bot = new TelegramApi(token, { polling: true });
+console.log("Bot has been started!");
+bot.setMyCommands(commandsBtns);
 
-let userSteps = [];
-let userInfo = {
-  replenishmentAmount: "",
-  accountId: "",
-  screenshot: null,
-};
+let userInfo = [];
 
 const cancel = (chatId) => {
-  userSteps = userSteps.filter((item) => item.chatId !== chatId);
-  userInfo = {
+  userInfo = userInfo.filter((item) => item.chatId !== chatId);
+  bot.sendMessage(chatId, MESSAGE.CANCEL);
+};
+
+const addNewUser = async (chatId) => {
+  let newUserInfo = {
+    chatId,
+    currentStep: 0,
     replenishmentAmount: "",
     accountId: "",
     screenshot: null,
   };
-
-  console.log("userSteps", userSteps);
-  console.log("userInfo", userInfo);
-};
-
-const createNewSteps = async (chatId) => {
-  let newChatStep = {
-    chatId,
-    currentStep: 1,
-  };
-  userSteps.push(newChatStep);
+  userInfo.push(newUserInfo);
 };
 
 const udpatedSteps = async (chatId) => {
-  const updated = userSteps.map((item) => {
+  const updated = userInfo?.map((item) => {
     if (item.chatId === chatId) {
       return {
         ...item,
@@ -50,124 +43,92 @@ const udpatedSteps = async (chatId) => {
     }
     return item;
   });
-  userSteps = updated;
+  userInfo = updated;
 };
 
-bot.setMyCommands(commandsBtns);
+const sendUserInfoToOut = async (foundUser) => {
+  await bot.sendMessage(
+    groupId,
+    `id аккаунта - ${foundUser.accountId}
+сумма пополнения  - ${foundUser.replenishmentAmount}`
+  );
+  await sendPhotoToChat(groupId, foundUser.screenshot);
+  return cancel(foundUser.chatId);
+};
 
 bot.on("message", async (msg) => {
   const text = msg.text;
   const chatId = msg.chat.id;
-  const messageId = msg.message_id;
-  console.log("message", msg);
 
   if (text === commandsValues.cancel) {
     return cancel(chatId);
   }
 
   if (text === commandsValues.start) {
-    await createNewSteps(chatId);
-    return bot.sendMessage(
-      chatId,
-      "Поздравляем! Вы подписались на 1xbet_official_kg - Пополнение и вывод средств.",
-      startOptions
-    );
+    await addNewUser(chatId);
+    return bot.sendMessage(chatId, MESSAGE.START, startOptions);
   }
 
-  if (text === commandsValues.info) {
-    return bot.sendMessage(
-      chatId,
-      `Вас зовут ${msg.from.first_name + msg.from.last_name}`
-    );
+  const foundUser = userInfo.find((item) => item.chatId === chatId);
+
+  if (foundUser) {
+    if (foundUser.currentStep === 1) {
+      foundUser.replenishmentAmount = text;
+      await udpatedSteps(chatId);
+      return bot.sendMessage(chatId, MESSAGE.ACCOUNT_ID);
+    }
+
+    if (foundUser.currentStep === 2) {
+      foundUser.accountId = text;
+      return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
+    }
+
+    if (foundUser.currentStep === 3) {
+      if ("document" in msg || "photo" in msg) {
+        foundUser.screenshot = msg.document || msg.photo;
+        await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
+        return sendUserInfoToOut(foundUser);
+      } else {
+        return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
+      }
+    }
   }
 
-  if (text === commandsValues.showBtn) {
-    return bot.sendMessage(chatId, "showBtn");
-  }
-
-  if (userSteps[0]?.currentStep === 3) {
-    userInfo = { ...userInfo, replenishmentAmount: text };
-    console.log(userInfo);
-    await udpatedSteps(chatId);
-    return bot.sendMessage(chatId, "Введите ID(Номер Счёта) 1XBET!");
-  }
-
-  if (userSteps[0]?.currentStep === 4) {
-    userInfo = { ...userInfo, accountId: text };
-    console.log(userInfo);
-    return bot.sendMessage(
-      chatId,
-      `Отправьте по следующим реквизитам.
-
-Реквизиты: OPTIMA BANK
-4169585352221641
-Реквизиты:  О деньги! (единицы)
-0509525550
-    
-После оплаты нажмите на кнопку ниже👇`,
-      paymentOptions
-    );
-  }
-
-  if (userSteps[0]?.currentStep === 5) {
-    userInfo = { ...userInfo, screenshot: msg.document || msg.photo || text };
-    console.log("userInfo last - ", userInfo);
-
-    return bot.sendMessage(
-      chatId,
-      `✅Ваша заявка принята на проверку!
-
-⚠️ Пополнение занимает от 5 до 15 минут. 
-Пожалуйста подождите!
-    
-⚠️При сложностях до 3 Часов!
-    
-✅Вы получите уведомление о зачислении средств!`
-    );
-  }
-
-  return bot.sendMessage(chatId, "Пожалуйста, выберите пункт из меню ниже.");
+  return bot.sendMessage(chatId, MESSAGE.WRONG);
 });
 
 bot.on("callback_query", async (msg) => {
   const data = msg.data;
   const chatId = msg.message.chat.id;
   const messageId = msg.message.message_id;
-  console.log("callback_query", msg);
-  if (data === message.replacement) {
-    udpatedSteps(chatId);
+  if (data === btnType.replacement) {
     await bot.deleteMessage(chatId, messageId);
     return bot.sendMessage(
       chatId,
-      "Выберите необходимый способ для пополнения!",
+      MESSAGE.REFILLMENT_METHOD,
       replacementOptions
     );
   }
 
-  if (data === message.mbank || data === message.omoney) {
+  if (data === btnType.mbank || data === btnType.omoney) {
     udpatedSteps(chatId);
     await bot.deleteMessage(chatId, messageId);
-    return bot.sendMessage(
+    const answer = await bot.sendMessage(
       chatId,
-      `Укажите сумму пополнения KGS.
-Минимальная сумма пополнения: 50.
-Максимальная сумма пополнения: 25 000`
+      MESSAGE.SUM_RULES
+      // {
+      //   reply_markup: {
+      //     force_reply: true,
+      //   },
+      // }
     );
+
+    console.log("answer", answer);
   }
 
-  if (data === message.paid) {
+  if (data === btnType.paid) {
     udpatedSteps(chatId);
     await bot.deleteMessage(chatId, messageId);
-    return bot.sendMessage(
-      chatId,
-      `Отправьте СКРИНШОТ Платёжа!
-
-❗️В скриншоте должны быть видны Дата и Время совершения платежа!
-В противном случае ваш платёж может не поступить на ваш Счёт!`
-    );
-  }
-
-  if (data === message.conclusion) {
-    return bot.sendMessage(chatId, "test");
+    return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
   }
 });
