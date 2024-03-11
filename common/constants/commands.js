@@ -1,13 +1,18 @@
 const commandsValues = {
   start: "/start",
-  cancel: '/cancel'
+  cancel: "/cancel",
 };
 
 const btnType = {
   replacement: "replacement",
   mbank: "mbank",
   omoney: "omoney",
+  conclusionMbank: 'conclusion_mbank',
+  conclusionOmoney: 'conclusion_omoney',
   paid: "paid",
+  conclusion: "conclusion",
+  accept: 'accept',
+  reject: 'reject'
 };
 
 const commandsBtns = [
