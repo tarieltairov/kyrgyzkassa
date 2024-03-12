@@ -105,7 +105,11 @@ bot.on("message", async (msg) => {
       if (checkNeedSum(text)) {
         foundUser.replenishmentAmount = text;
         await udpatedSteps(chatId);
-        return bot.sendMessage(chatId, MESSAGE.ACCOUNT_ID);
+        return bot.sendPhoto(
+          chatId,
+          fs.readFileSync("common/assets/images/photo.jpg"),
+          { caption: MESSAGE.ACCOUNT_ID }
+        );
       } else {
         return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
       }
@@ -119,7 +123,7 @@ bot.on("message", async (msg) => {
 
     if (foundUser.currentStep === 3) {
       if ("document" in msg || "photo" in msg) {
-        foundUser.screenshot = msg.document || msg.photo; 
+        foundUser.screenshot = msg.document || msg.photo;
         await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
         return sendUserInfoToOut(foundUser);
       } else {
@@ -144,6 +148,7 @@ bot.on("message", async (msg) => {
     if (foundUser.currentStep === 6) {
       foundUser.conclusionAccountId = text;
       udpatedSteps(chatId);
+      await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION)
       return bot.sendMessage(chatId, MESSAGE.CODE);
     }
     if (foundUser.currentStep === 7) {

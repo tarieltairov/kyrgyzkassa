@@ -5,9 +5,9 @@ const { setAdminOptions } = require("../constants/options");
 const sendPhotoToChat = async (groupId, screenshot, foundUser) => {
   const caption = ` ТИП ОПЕРАЦИИ: ПОПОЛНЕНИЕ
 
-id аккаунта - ${foundUser.accountId}
-сумма пополнения - ${foundUser.replenishmentAmount} cом
-способ оплаты - ${
+ID - ${foundUser.accountId}
+СУММА - ${foundUser.replenishmentAmount} cом
+ОПЛАТА - ${
     foundUser.refillmentMethod === btnType.mbank ? "Mbank" : "О Деньги!"
   }`;
 
@@ -42,5 +42,5 @@ const getUserChatIdFromAdmin = (str) => {
 module.exports = {
   sendPhotoToChat,
   checkNeedSum,
-  getUserChatIdFromAdmin
+  getUserChatIdFromAdmin,
 };
