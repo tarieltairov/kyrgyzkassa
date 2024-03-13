@@ -1,26 +1,29 @@
 const fs = require("fs");
-const { bot, groupId } = require("./botConfig");
+const { bot } = require("./botConfig");
+
+const { commandsValues, btnType } = require("./common/constants/commands");
+
 const {
-  commandsBtns,
-  commandsValues,
-  btnType,
-} = require("./common/constants/commands");
-const { MESSAGE } = require("./common/constants/message");
+  MESSAGE,
+  setRequisites,
+  REQUISITES,
+} = require("./common/constants/message");
+
 const {
   startOptions,
   replacementOptions,
   paymentOptions,
   conclusionOptions,
-  setAdminOptions,
 } = require("./common/constants/options");
+
 const {
-  sendPhotoToChat,
   checkNeedSum,
   getUserChatIdFromAdmin,
+  sendConclusion,
+  sendReplenishment,
 } = require("./common/helpers");
 
 console.log("Bot has been started!");
-bot.setMyCommands(commandsBtns);
 
 let userInfo = [];
 const cancel = (chatId) => {
@@ -28,7 +31,7 @@ const cancel = (chatId) => {
   bot.sendMessage(chatId, MESSAGE.CANCEL);
 };
 
-const addNewUser = async (chatId) => {
+const addNewUser = async (chatId, user) => {
   let newUserInfo = {
     chatId,
     currentStep: 0,
@@ -44,6 +47,7 @@ const addNewUser = async (chatId) => {
     conlusionRefillmentMethod: "",
     conlusionAmount: "",
     lastApplicationDate: "",
+    user,
   };
   userInfo.push(newUserInfo);
 };
@@ -62,39 +66,34 @@ const udpatedSteps = async (chatId, step = 1) => {
 };
 
 const sendUserInfoToOut = async (foundUser) => {
-  await sendPhotoToChat(groupId, foundUser.screenshot, foundUser);
+  await sendReplenishment(foundUser);
   return cancel(foundUser.chatId);
 };
 
 const sendConclusionUserInfo = async (foundUser) => {
-  await bot.sendMessage(
-    groupId,
-    `ТИП ОПЕРАЦИИ: ВЫВОД
-  
-id аккаунта - ${foundUser.conclusionAccountId}
-способ приема оплаты - ${
-      foundUser.conlusionRefillmentMethod === btnType.conclusionMbank
-        ? "Mbank"
-        : "О Деньги!"
-    }
-реквизиты - ${foundUser.conclusionRequisites}
-сумма вывода - ${foundUser.conlusionAmount} сом
-код - ${foundUser.conclusionCode}`,
-    setAdminOptions(foundUser.chatId)
-  );
+  await sendConclusion(foundUser);
   return cancel(foundUser.chatId);
 };
 
 bot.on("message", async (msg) => {
   const text = msg.text;
   const chatId = msg.chat.id;
+  const userName = msg.chat.username;
+
+  if (text === commandsValues.aktan || text === commandsValues.kairat) {
+    setRequisites(text);
+    return bot.sendMessage(
+      chatId,
+      `Реквизиты изменены на ваши ${REQUISITES.find((i) => i.id === text).name}`
+    );
+  }
 
   if (text === commandsValues.cancel) {
     return cancel(chatId);
   }
 
   if (text === commandsValues.start) {
-    await addNewUser(chatId);
+    await addNewUser(chatId, userName);
     return bot.sendMessage(chatId, MESSAGE.START, startOptions);
   }
 
@@ -107,7 +106,7 @@ bot.on("message", async (msg) => {
         await udpatedSteps(chatId);
         return bot.sendPhoto(
           chatId,
-          fs.readFileSync("common/assets/images/photo.jpg"),
+          fs.readFile("common/assets/images/photo.jpg"),
           { caption: MESSAGE.ACCOUNT_ID }
         );
       } else {
@@ -139,16 +138,13 @@ bot.on("message", async (msg) => {
       return bot.sendPhoto(
         chatId,
         fs.readFileSync("common/assets/images/photo.jpg"),
-        {
-          caption:
-            "Введите номер счёта, с которого выводите средства (1xBET ID)",
-        }
+        { caption: MESSAGE.ACCOUNT_ID }
       );
     }
     if (foundUser.currentStep === 6) {
       foundUser.conclusionAccountId = text;
       udpatedSteps(chatId);
-      await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION)
+      await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
       return bot.sendMessage(chatId, MESSAGE.CODE);
     }
     if (foundUser.currentStep === 7) {
@@ -167,7 +163,6 @@ bot.on("message", async (msg) => {
 });
 
 bot.on("callback_query", async (msg) => {
-  console.log("msg", msg);
   const data = msg.data;
   const chatId = msg.message.chat.id;
   const messageId = msg.message.message_id;
@@ -219,10 +214,6 @@ bot.on("callback_query", async (msg) => {
 
   // --------------------admin actions ----------------------
   if (data.includes(btnType.accept)) {
-    // await bot.editMessageText("время ", {
-    //   chat_id: chatId,
-    //   message_id: messageId,
-    // });
     await bot.editMessageCaption(
       msg.message.caption + "\n\n" + "ПРИНЯТО за ...",
       {
@@ -232,14 +223,20 @@ bot.on("callback_query", async (msg) => {
     );
     return bot.sendMessage(
       getUserChatIdFromAdmin(data),
-      "✅ ваша последняя заявка принята"
+      MESSAGE.FULFILLED_APPLICATION
     );
   }
-  bot.getMessage;
   if (data.includes(btnType.reject)) {
+    await bot.editMessageCaption(
+      msg.message.caption + "\n\n" + "ОТКЛОНЕНО за ...",
+      {
+        chat_id: chatId,
+        message_id: messageId,
+      }
+    );
     return bot.sendMessage(
       getUserChatIdFromAdmin(data),
-      "❌ ваша последняя заявка отклонена"
+      MESSAGE.REJECTED_APPLICATION
     );
   }
 });
