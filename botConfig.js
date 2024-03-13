@@ -7,7 +7,7 @@ const bot = new TelegramApi(token, { polling: true });
 bot.setMyCommands(commandsBtns);
 
 const groupId = "-4112697287";
-const replenishmentGroupId = "-4126156298";
+const replenishmentGroupId = "-4192521636";
 const conclusionGroupId = "-4171897579";
 
 module.exports = {

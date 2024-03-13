@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { bot } = require("./botConfig");
 
+// bot.getUpdates()
 const { commandsValues, btnType } = require("./common/constants/commands");
 
 const {
@@ -18,9 +19,9 @@ const {
 
 const {
   checkNeedSum,
-  getUserChatIdFromAdmin,
   sendConclusion,
   sendReplenishment,
+  editAdminMessage,
 } = require("./common/helpers");
 
 console.log("Bot has been started!");
@@ -79,7 +80,6 @@ bot.on("message", async (msg) => {
   const text = msg.text;
   const chatId = msg.chat.id;
   const userName = msg.chat.username;
-
   if (text === commandsValues.aktan || text === commandsValues.kairat) {
     setRequisites(text);
     return bot.sendMessage(
@@ -106,7 +106,7 @@ bot.on("message", async (msg) => {
         await udpatedSteps(chatId);
         return bot.sendPhoto(
           chatId,
-          fs.readFile("common/assets/images/photo.jpg"),
+          fs.readFileSync("common/assets/images/photo.jpg"),
           { caption: MESSAGE.ACCOUNT_ID }
         );
       } else {
@@ -214,29 +214,10 @@ bot.on("callback_query", async (msg) => {
 
   // --------------------admin actions ----------------------
   if (data.includes(btnType.accept)) {
-    await bot.editMessageCaption(
-      msg.message.caption + "\n\n" + "ПРИНЯТО за ...",
-      {
-        chat_id: chatId,
-        message_id: messageId,
-      }
-    );
-    return bot.sendMessage(
-      getUserChatIdFromAdmin(data),
-      MESSAGE.FULFILLED_APPLICATION
-    );
+    return editAdminMessage(msg, btnType.accept);
   }
   if (data.includes(btnType.reject)) {
-    await bot.editMessageCaption(
-      msg.message.caption + "\n\n" + "ОТКЛОНЕНО за ...",
-      {
-        chat_id: chatId,
-        message_id: messageId,
-      }
-    );
-    return bot.sendMessage(
-      getUserChatIdFromAdmin(data),
-      MESSAGE.REJECTED_APPLICATION
-    );
+    return editAdminMessage(msg, btnType.reject);
   }
 });
+
