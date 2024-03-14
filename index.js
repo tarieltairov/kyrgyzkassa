@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { bot } = require("./botConfig");
+const { bot, replenishmentGroupId, conclusionGroupId } = require("./botConfig");
 
 // bot.getUpdates()
 const { commandsValues, btnType } = require("./common/constants/commands");
@@ -82,88 +82,91 @@ const start = async () => {
       const text = msg.text;
       const chatId = msg.chat.id;
       const userName = msg.chat.username;
-      if (text === commandsValues.aktan || text === commandsValues.kairat) {
-        setRequisites(text);
-        return bot.sendMessage(
-          chatId,
-          `Реквизиты изменены на ваши ${
-            REQUISITES.find((i) => i.id === text).name
-          }`
-        );
-      }
+      const isNotAdminGroups = chatId !== replenishmentGroupId && chatId !== conclusionGroupId;
+      if (isNotAdminGroups) {
+        if (text === commandsValues.aktan || text === commandsValues.kairat) {
+          setRequisites(text);
+          return bot.sendMessage(
+            chatId,
+            `Реквизиты изменены на ваши ${
+              REQUISITES.find((i) => i.id === text).name
+            }`
+          );
+        }
 
-      if (text === commandsValues.cancel) {
-        return cancel(chatId);
-      }
+        if (text === commandsValues.cancel) {
+          return cancel(chatId);
+        }
 
-      if (text === commandsValues.start) {
-        await addNewUser(chatId, userName);
-        return bot.sendMessage(chatId, MESSAGE.START, startOptions);
-      }
+        if (text === commandsValues.start) {
+          await addNewUser(chatId, userName);
+          return bot.sendMessage(chatId, MESSAGE.START, startOptions);
+        }
 
-      const foundUser = userInfo.find((item) => item.chatId === chatId);
+        const foundUser = userInfo.find((item) => item.chatId === chatId);
 
-      if (foundUser) {
-        if (foundUser.currentStep === 1) {
-          if (checkNeedSum(text)) {
-            foundUser.replenishmentAmount = text;
-            await udpatedSteps(chatId);
+        if (foundUser) {
+          if (foundUser.currentStep === 1) {
+            if (checkNeedSum(text)) {
+              foundUser.replenishmentAmount = text;
+              await udpatedSteps(chatId);
+              return bot.sendPhoto(
+                chatId,
+                fs.readFileSync("common/assets/images/photo.jpg"),
+                { caption: MESSAGE.ACCOUNT_ID }
+              );
+            } else {
+              return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
+            }
+          }
+
+          if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
+            foundUser.accountId = text;
+            foundUser.isFullAccountId = true;
+            return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
+          }
+
+          if (foundUser.currentStep === 3) {
+            if ("document" in msg || "photo" in msg) {
+              foundUser.screenshot = msg.document || msg.photo;
+              await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
+              return sendUserInfoToOut(foundUser);
+            } else {
+              return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
+            }
+          }
+          if (!foundUser.isPaid && foundUser.currentStep === 2) {
+            return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
+          }
+          if (foundUser.currentStep === 5) {
+            foundUser.conclusionRequisites = text;
+            udpatedSteps(chatId);
             return bot.sendPhoto(
               chatId,
               fs.readFileSync("common/assets/images/photo.jpg"),
               { caption: MESSAGE.ACCOUNT_ID }
             );
-          } else {
-            return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
+          }
+          if (foundUser.currentStep === 6) {
+            foundUser.conclusionAccountId = text;
+            udpatedSteps(chatId);
+            await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
+            return bot.sendMessage(chatId, MESSAGE.CODE);
+          }
+          if (foundUser.currentStep === 7) {
+            foundUser.conclusionCode = text;
+            udpatedSteps(chatId);
+            return bot.sendMessage(chatId, MESSAGE.CONCLUSION_SUM_RULES);
+          }
+          if (foundUser.currentStep === 8) {
+            foundUser.conlusionAmount = text;
+            await bot.sendMessage(chatId, MESSAGE.CONCLUSION_ACCEPTED);
+            return sendConclusionUserInfo(foundUser);
           }
         }
 
-        if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
-          foundUser.accountId = text;
-          foundUser.isFullAccountId = true;
-          return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
-        }
-
-        if (foundUser.currentStep === 3) {
-          if ("document" in msg || "photo" in msg) {
-            foundUser.screenshot = msg.document || msg.photo;
-            await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
-            return sendUserInfoToOut(foundUser);
-          } else {
-            return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
-          }
-        }
-        if (!foundUser.isPaid && foundUser.currentStep === 2) {
-          return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
-        }
-        if (foundUser.currentStep === 5) {
-          foundUser.conclusionRequisites = text;
-          udpatedSteps(chatId);
-          return bot.sendPhoto(
-            chatId,
-            fs.readFileSync("common/assets/images/photo.jpg"),
-            { caption: MESSAGE.ACCOUNT_ID }
-          );
-        }
-        if (foundUser.currentStep === 6) {
-          foundUser.conclusionAccountId = text;
-          udpatedSteps(chatId);
-          await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
-          return bot.sendMessage(chatId, MESSAGE.CODE);
-        }
-        if (foundUser.currentStep === 7) {
-          foundUser.conclusionCode = text;
-          udpatedSteps(chatId);
-          return bot.sendMessage(chatId, MESSAGE.CONCLUSION_SUM_RULES);
-        }
-        if (foundUser.currentStep === 8) {
-          foundUser.conlusionAmount = text;
-          await bot.sendMessage(chatId, MESSAGE.CONCLUSION_ACCEPTED);
-          return sendConclusionUserInfo(foundUser);
-        }
+        return bot.sendMessage(chatId, MESSAGE.WRONG);
       }
-
-      return bot.sendMessage(chatId, MESSAGE.WRONG);
     });
 
     bot.on("callback_query", async (msg) => {
