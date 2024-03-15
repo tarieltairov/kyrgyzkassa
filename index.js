@@ -82,7 +82,8 @@ const start = async () => {
       const text = msg.text;
       const chatId = msg.chat.id;
       const userName = msg.chat.username;
-      const isNotAdminGroups = chatId !== replenishmentGroupId && chatId !== conclusionGroupId;
+      const isNotAdminGroups =
+        chatId !== replenishmentGroupId && chatId !== conclusionGroupId;
       if (isNotAdminGroups) {
         if (text === commandsValues.aktan || text === commandsValues.kairat) {
           setRequisites(text);
