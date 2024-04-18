@@ -19,6 +19,8 @@ const conclusionOptions = {
         { text: "О Деньги!", callback_data: "conclusion_omoney" },
         { text: "Mbank", callback_data: "conclusion_mbank" },
       ],
+      [{ text: "Оптима", callback_data: "conclusion_optima" }],
+      [{ text: "Элкарт", callback_data: "conclusion_elcart" }],
     ],
   }),
 };
@@ -30,6 +32,8 @@ const replacementOptions = {
         { text: "О Деньги!", callback_data: "omoney" },
         { text: "Mbank", callback_data: "mbank" },
       ],
+      [{ text: "Оптима", callback_data: "optima" }],
+      [{ text: "Элкарт", callback_data: "elcart" }],
     ],
   }),
 };

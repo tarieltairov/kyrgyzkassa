@@ -3,7 +3,7 @@ const {
   conclusionGroupId,
   replenishmentGroupId,
 } = require("../../botConfig");
-const { btnType } = require("../constants/commands");
+const { btnType, reqMethod } = require("../constants/commands");
 const { MESSAGE } = require("../constants/message");
 const { setAdminOptions } = require("../constants/options");
 const fs = require("fs");
@@ -14,9 +14,7 @@ const sendReplenishment = async (foundUser) => {
 ПОЛЬЗОВАТЕЛЬ - @${foundUser.user}
 ID - ${foundUser.accountId}
 СУММА - ${foundUser.replenishmentAmount} cом
-ОПЛАТА - ${
-    foundUser.refillmentMethod === btnType.mbank ? "Mbank" : "О Деньги!"
-  }`;
+ОПЛАТА - ${reqMethod[foundUser.refillmentMethod]}`;
 
   try {
     if (Array.isArray(foundUser.screenshot)) {
@@ -57,16 +55,12 @@ const getUserChatIdFromAdmin = (str) => {
 const sendConclusion = async (foundUser) => {
   const caption = `ТИП ОПЕРАЦИИ: ВЫВОД
 
-  ПОЛЬЗОВАТЕЛЬ - @${foundUser.user}
-  ID - ${foundUser.conclusionAccountId}
-  ОПЛАТА - ${
-    foundUser.conlusionRefillmentMethod === btnType.conclusionMbank
-      ? "Mbank"
-      : "О Деньги!"
-  }
-  РЕКВИЗИТЫ - ${foundUser.conclusionRequisites}
-  СУММА ВЫВОДА - ${foundUser.conlusionAmount} сом
-  КОД - ${foundUser.conclusionCode}`;
+ПОЛЬЗОВАТЕЛЬ - @${foundUser.user}
+ID - ${foundUser.conclusionAccountId}
+ОПЛАТА - ${reqMethod[foundUser.conlusionRefillmentMethod]}
+РЕКВИЗИТЫ - ${foundUser.conclusionRequisites}
+СУММА ВЫВОДА - ${foundUser.conlusionAmount} сом
+КОД - ${foundUser.conclusionCode}`;
   bot.sendPhoto(
     conclusionGroupId,
     fs.readFileSync("common/assets/images/conclusion.jpg"),

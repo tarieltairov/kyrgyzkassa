@@ -2,7 +2,11 @@ const fs = require("fs");
 const { bot, replenishmentGroupId, conclusionGroupId } = require("./botConfig");
 
 // bot.getUpdates()
-const { commandsValues, btnType } = require("./common/constants/commands");
+const {
+  commandsValues,
+  btnType,
+  reqMethod,
+} = require("./common/constants/commands");
 
 const {
   MESSAGE,
@@ -186,7 +190,12 @@ const start = async () => {
           );
         }
 
-        if (data === btnType.mbank || data === btnType.omoney) {
+        if (
+          data === btnType.mbank ||
+          data === btnType.omoney ||
+          data === btnType.optima ||
+          data === btnType.elcart
+        ) {
           foundUser.refillmentMethod = data;
           udpatedSteps(chatId);
           await bot.deleteMessage(chatId, messageId);
@@ -208,17 +217,14 @@ const start = async () => {
 
         if (
           data === btnType.conclusionMbank ||
-          data === btnType.conclusionOmoney
+          data === btnType.conclusionOmoney ||
+          data === btnType.conclusionOptima ||
+          data === btnType.conclusionElcart
         ) {
           foundUser.conlusionRefillmentMethod = data;
           udpatedSteps(chatId, 5);
           await bot.deleteMessage(chatId, messageId);
-          await bot.sendMessage(
-            chatId,
-            `Метод вывода: ${
-              data === btnType.conclusionMbank ? "Mbank" : "О Деньги!"
-            }`
-          );
+          await bot.sendMessage(chatId, `Метод вывода: ${reqMethod[data]}`);
           return bot.sendMessage(chatId, MESSAGE.CONCLUSION_REQUISITES);
         }
       }
