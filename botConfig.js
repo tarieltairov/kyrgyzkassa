@@ -5,6 +5,11 @@ require("dotenv").config();
 const token = process.env.BOT_TOKENN;
 const replenishmentGroupId = process.env.REPLENISHMENT_GROUP_ID;
 const conclusionGroupId = process.env.CONCLUSION_GROUP_ID;
+const accessAcconts = {
+  aktan: process.env.AKTAN,
+  kairat: process.env.KAIRAT,
+  proger: process.env.PROGER,
+};
 
 const bot = new TelegramApi(token, { polling: true });
 bot.setMyCommands(commandsBtns);
@@ -13,4 +18,5 @@ module.exports = {
   bot,
   replenishmentGroupId,
   conclusionGroupId,
+  accessAcconts,
 };

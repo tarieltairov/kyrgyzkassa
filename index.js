@@ -1,6 +1,10 @@
 const fs = require("fs");
-const { bot, replenishmentGroupId, conclusionGroupId } = require("./botConfig");
-
+const {
+  bot,
+  replenishmentGroupId,
+  conclusionGroupId,
+  accessAcconts,
+} = require("./botConfig");
 // bot.getUpdates()
 const {
   commandsValues,
@@ -33,6 +37,18 @@ const start = async () => {
 
   try {
     let userInfo = [];
+    let isBotActive = true;
+
+    const turnOnBot = () => {
+      isBotActive = true;
+      console.log("Bot has been turned on!");
+    };
+
+    const turnOffBot = () => {
+      isBotActive = false;
+      console.log("Bot has been turned off!");
+    };
+
     const cancel = (chatId) => {
       userInfo = userInfo.filter((item) => item.chatId !== chatId);
       bot.sendMessage(chatId, MESSAGE.CANCEL);
@@ -88,89 +104,125 @@ const start = async () => {
       const userName = msg.chat.username;
       const isNotAdminGroups =
         chatId !== replenishmentGroupId && chatId !== conclusionGroupId;
-      if (isNotAdminGroups) {
-        if (text === commandsValues.aktan || text === commandsValues.kairat) {
-          setRequisites(text);
-          return bot.sendMessage(
-            chatId,
-            `Реквизиты изменены на ваши ${
-              REQUISITES.find((i) => i.id === text).name
-            }`
-          );
-        }
+      const isAccessAccount = Object.values(accessAcconts).some(
+        (item) => item == msg.from.id
+      );
+      if (isBotActive) {
+        if (isNotAdminGroups) {
+          if (isAccessAccount) {
+            if (text === commandsValues.botTurnOn) {
+              return bot.sendMessage(chatId, MESSAGE.BOT_ON_YET);
+            }
+            if (text === commandsValues.botTurnOff) {
+              turnOffBot();
+              return bot.sendMessage(chatId, MESSAGE.BOT_OFF);
+            }
+            if (
+              text === commandsValues.aktan ||
+              text === commandsValues.kairat
+            ) {
+              setRequisites(text);
+              return bot.sendMessage(
+                chatId,
+                `Реквизиты изменены на ваши ${
+                  REQUISITES.find((i) => i.id === text).name
+                }`
+              );
+            }
+          }
 
-        if (text === commandsValues.cancel) {
-          return cancel(chatId);
-        }
+          if (text === commandsValues.cancel) {
+            return cancel(chatId);
+          }
 
-        if (text === commandsValues.start) {
-          await addNewUser(chatId, userName);
-          return bot.sendMessage(chatId, MESSAGE.START, startOptions);
-        }
+          if (text === commandsValues.start) {
+            await addNewUser(chatId, userName);
+            return bot.sendMessage(chatId, MESSAGE.START, startOptions);
+          }
 
-        const foundUser = userInfo.find((item) => item.chatId === chatId);
+          const foundUser = userInfo.find((item) => item.chatId === chatId);
 
-        if (foundUser) {
-          if (foundUser.currentStep === 1) {
-            if (checkNeedSum(text)) {
-              foundUser.replenishmentAmount = text;
-              await udpatedSteps(chatId);
+          if (foundUser) {
+            if (foundUser.currentStep === 1) {
+              if (checkNeedSum(text)) {
+                foundUser.replenishmentAmount = text;
+                await udpatedSteps(chatId);
+                return bot.sendPhoto(
+                  chatId,
+                  fs.readFileSync("common/assets/images/photo.jpg"),
+                  { caption: MESSAGE.ACCOUNT_ID }
+                );
+              } else {
+                return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
+              }
+            }
+
+            if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
+              foundUser.accountId = text;
+              foundUser.isFullAccountId = true;
+              return bot.sendMessage(
+                chatId,
+                MESSAGE.REQUISITES,
+                paymentOptions
+              );
+            }
+
+            if (foundUser.currentStep === 3) {
+              if ("document" in msg || "photo" in msg) {
+                foundUser.screenshot = msg.document || msg.photo;
+                await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
+                return sendUserInfoToOut(foundUser);
+              } else {
+                return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
+              }
+            }
+            if (!foundUser.isPaid && foundUser.currentStep === 2) {
+              return bot.sendMessage(
+                chatId,
+                MESSAGE.REQUISITES,
+                paymentOptions
+              );
+            }
+            if (foundUser.currentStep === 5) {
+              foundUser.conclusionRequisites = text;
+              udpatedSteps(chatId);
               return bot.sendPhoto(
                 chatId,
                 fs.readFileSync("common/assets/images/photo.jpg"),
                 { caption: MESSAGE.ACCOUNT_ID }
               );
-            } else {
-              return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
+            }
+            if (foundUser.currentStep === 6) {
+              foundUser.conclusionAccountId = text;
+              udpatedSteps(chatId);
+              await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
+              return bot.sendMessage(chatId, MESSAGE.CODE);
+            }
+            if (foundUser.currentStep === 7) {
+              foundUser.conclusionCode = text;
+              udpatedSteps(chatId);
+              return bot.sendMessage(chatId, MESSAGE.CONCLUSION_SUM_RULES);
+            }
+            if (foundUser.currentStep === 8) {
+              foundUser.conlusionAmount = text;
+              await bot.sendMessage(chatId, MESSAGE.CONCLUSION_ACCEPTED);
+              return sendConclusionUserInfo(foundUser);
             }
           }
 
-          if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
-            foundUser.accountId = text;
-            foundUser.isFullAccountId = true;
-            return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
+          return bot.sendMessage(chatId, MESSAGE.WRONG);
+        }
+      } else {
+        if (isAccessAccount) {
+          if (text === commandsValues.botTurnOn) {
+            turnOnBot();
+            return bot.sendMessage(chatId, MESSAGE.BOT_ON);
           }
-
-          if (foundUser.currentStep === 3) {
-            if ("document" in msg || "photo" in msg) {
-              foundUser.screenshot = msg.document || msg.photo;
-              await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
-              return sendUserInfoToOut(foundUser);
-            } else {
-              return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
-            }
-          }
-          if (!foundUser.isPaid && foundUser.currentStep === 2) {
-            return bot.sendMessage(chatId, MESSAGE.REQUISITES, paymentOptions);
-          }
-          if (foundUser.currentStep === 5) {
-            foundUser.conclusionRequisites = text;
-            udpatedSteps(chatId);
-            return bot.sendPhoto(
-              chatId,
-              fs.readFileSync("common/assets/images/photo.jpg"),
-              { caption: MESSAGE.ACCOUNT_ID }
-            );
-          }
-          if (foundUser.currentStep === 6) {
-            foundUser.conclusionAccountId = text;
-            udpatedSteps(chatId);
-            await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
-            return bot.sendMessage(chatId, MESSAGE.CODE);
-          }
-          if (foundUser.currentStep === 7) {
-            foundUser.conclusionCode = text;
-            udpatedSteps(chatId);
-            return bot.sendMessage(chatId, MESSAGE.CONCLUSION_SUM_RULES);
-          }
-          if (foundUser.currentStep === 8) {
-            foundUser.conlusionAmount = text;
-            await bot.sendMessage(chatId, MESSAGE.CONCLUSION_ACCEPTED);
-            return sendConclusionUserInfo(foundUser);
+          if (text === commandsValues.botTurnOff) {
+            return bot.sendMessage(chatId, MESSAGE.BOT_OFF_YET);
           }
         }
-
-        return bot.sendMessage(chatId, MESSAGE.WRONG);
+        return bot.sendMessage(chatId, MESSAGE.BOT_OFF_CLIENT);
       }
     });
 
@@ -180,6 +232,9 @@ const start = async () => {
       const messageId = msg.message.message_id;
       const foundUser = userInfo.find((item) => item.chatId === chatId);
       if (foundUser) {
+        if (!isBotActive) {
+          return bot.sendMessage(chatId, MESSAGE.BOT_OFF_CLIENT);
+        }
         if (data === btnType.replacement) {
           await bot.deleteMessage(chatId, messageId);
           await bot.sendMessage(chatId, "📥");
@@ -243,10 +298,3 @@ const start = async () => {
 };
 
 start();
-
-// const off = async () => {
-//   console.log("Bot has been offed");
-//   process.exit();
-// };
-
-// off();

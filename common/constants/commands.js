@@ -3,6 +3,8 @@ const commandsValues = {
   cancel: "/cancel",
   aktan: "/aktanlogin",
   kairat: "/kairatlogin",
+  botTurnOn: "/turnonbot",
+  botTurnOff: "/turnoffbot",
 };
 
 const btnType = {
