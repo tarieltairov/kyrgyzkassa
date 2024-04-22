@@ -21,6 +21,7 @@ const btnType = {
   conclusion: "conclusion",
   accept: "accept",
   reject: "reject",
+  startAfterSubscribe: "startAfterSubscribe",
 };
 
 const reqMethod = {

@@ -2,6 +2,7 @@ const {
   bot,
   conclusionGroupId,
   replenishmentGroupId,
+  targetChannelId,
 } = require("../../botConfig");
 const { btnType, reqMethod } = require("../constants/commands");
 const { MESSAGE } = require("../constants/message");
@@ -130,6 +131,33 @@ const editAdminMessage = async (msg, type) => {
   );
 };
 
+const subscribeToChannel = (chatId) => {
+  bot.getChat(targetChannelId).then((channel) => {
+    bot.sendMessage(
+      chatId,
+      `Вы не являетесь участником канала\n"${channel.title}" 🙅‍♂️.\n\nПодпишитесь на канал 👇, чтобы пользоваться ботом 😉`,
+      {
+        reply_markup: JSON.stringify({
+          inline_keyboard: [
+            [
+              {
+                text: "Подписаться на канал",
+                url: channel.invite_link,
+              },
+            ],
+            [
+              {
+                text: "Я подписался",
+                callback_data: "startAfterSubscribe",
+              },
+            ],
+          ],
+        }),
+      }
+    );
+  });
+};
+
 module.exports = {
   sendConclusion,
   sendReplenishment,
@@ -137,4 +165,5 @@ module.exports = {
   getUserChatIdFromAdmin,
   calculateTimeDifference,
   editAdminMessage,
+  subscribeToChannel,
 };
