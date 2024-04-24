@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.2",
     "node-telegram-bot-api": "^0.64.0",
     "nodemon": "^3.1.0"
   }

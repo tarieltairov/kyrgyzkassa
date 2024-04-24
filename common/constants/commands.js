@@ -5,6 +5,7 @@ const commandsValues = {
   kairat: "/kairatlogin",
   botTurnOn: "/turnonbot",
   botTurnOff: "/turnoffbot",
+  botIsWorking: "/botworking",
 };
 
 const btnType = {

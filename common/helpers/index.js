@@ -8,6 +8,7 @@ const { btnType, reqMethod } = require("../constants/commands");
 const { MESSAGE } = require("../constants/message");
 const { setAdminOptions } = require("../constants/options");
 const fs = require("fs");
+const User = require("../../models/users.model");
 
 const sendReplenishment = async (foundUser) => {
   const caption = ` ТИП ОПЕРАЦИИ: ПОПОЛНЕНИЕ
@@ -158,6 +159,30 @@ const subscribeToChannel = (chatId) => {
   });
 };
 
+const sendUserChatId = async (userChatId) => {
+  try {
+    const existingUser = await User.findOne({
+      userChatId,
+    });
+    if (!existingUser) {
+      const newUser = await User.create({ userChatId });
+      return newUser;
+    }
+    return "такой пользователь уже есть";
+  } catch (error) {
+    console.log("err", error);
+  }
+};
+
+const getUsers = async () => {
+  try {
+    const users = await User.find({});
+    return users;
+  } catch (error) {
+    console.log("err", error);
+  }
+};
+
 module.exports = {
   sendConclusion,
   sendReplenishment,
@@ -166,4 +191,6 @@ module.exports = {
   calculateTimeDifference,
   editAdminMessage,
   subscribeToChannel,
+  sendUserChatId,
+  getUsers,
 };

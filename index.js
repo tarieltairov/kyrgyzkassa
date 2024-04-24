@@ -5,6 +5,7 @@ const {
   conclusionGroupId,
   accessAcconts,
   targetChannelId,
+  dbToken,
 } = require("./botConfig");
 // bot.getUpdates()
 const {
@@ -32,8 +33,15 @@ const {
   sendReplenishment,
   editAdminMessage,
   subscribeToChannel,
+  sendUserChatId,
+  getUsers,
 } = require("./common/helpers");
 const { userStatusbyChannel } = require("./common/constants/other");
+const mongoose = require("mongoose");
+
+mongoose.connect(dbToken).then(() => {
+  console.log("Connected to database!");
+});
 
 const start = async () => {
   console.log("Bot has been started!");
@@ -75,6 +83,7 @@ const start = async () => {
         user,
       };
       userInfo.push(newUserInfo);
+      sendUserChatId(chatId);
     };
 
     const udpatedSteps = async (chatId, step = 1) => {
@@ -136,6 +145,20 @@ const start = async () => {
                         REQUISITES.find((i) => i.id === text).name
                       }`
                     );
+                  }
+                  if (text === commandsValues.botIsWorking) {
+                    const res = await getUsers();
+                    if (res.length) {
+                      return res.forEach((user) => {
+                        bot.sendMessage(
+                          user.userChatId,
+                          MESSAGE.BOT_IS_WORKING
+                        );
+                      });
+                    } else {
+                      await bot.sendMessage(chatId, MESSAGE.EMPTY_DB);
+                      return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
+                    }
                   }
                 }
 

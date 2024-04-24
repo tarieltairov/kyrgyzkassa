@@ -2,6 +2,7 @@ const TelegramApi = require("node-telegram-bot-api");
 const { commandsBtns } = require("./common/constants/commands");
 require("dotenv").config();
 
+const dbToken = process.env.DB_TOKEN;
 const targetChannelId = process.env.CHANNEL_ID;
 const token = process.env.BOT_TOKENN;
 const replenishmentGroupId = process.env.REPLENISHMENT_GROUP_ID;
@@ -21,4 +22,5 @@ module.exports = {
   replenishmentGroupId,
   conclusionGroupId,
   accessAcconts,
+  dbToken,
 };
