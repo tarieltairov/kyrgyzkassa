@@ -35,6 +35,7 @@ const {
   subscribeToChannel,
   sendUserChatId,
   getUsers,
+  editAdmiMessageAfterSuspicious,
 } = require("./common/helpers");
 const { userStatusbyChannel } = require("./common/constants/other");
 const mongoose = require("mongoose");
@@ -348,6 +349,12 @@ const start = async () => {
       }
       if (data.includes(btnType.reject)) {
         return editAdminMessage(msg, btnType.reject);
+      }
+      if (data.includes(btnType.suspicious)) {
+        return editAdmiMessageAfterSuspicious(msg, true);
+      }
+      if (data.includes(btnType.normal)) {
+        return editAdmiMessageAfterSuspicious(msg, false);
       }
     });
   } catch (error) {

@@ -54,6 +54,7 @@ const MESSAGE = {
   BOT_IS_WORKING:
     "🚀 Бот работает в штатном режиме 🚀\n\n✅ Нажмите на старт ✅\n\n/start                   /start                   /start",
   EMPTY_DB: "В базе пока нет ни одного пользователя 🧹",
+  SUSPICIOUS: "🤔 ПОДОЗРИТЕЛЬНЫЙ !!!\n\n",
 };
 
 module.exports = {

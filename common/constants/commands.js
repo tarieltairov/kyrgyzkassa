@@ -23,6 +23,8 @@ const btnType = {
   accept: "accept",
   reject: "reject",
   startAfterSubscribe: "startAfterSubscribe",
+  suspicious: "suspicious",
+  normal: "normal",
 };
 
 const reqMethod = {

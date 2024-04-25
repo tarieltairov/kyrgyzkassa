@@ -10,8 +10,27 @@ const { setAdminOptions } = require("../constants/options");
 const fs = require("fs");
 const User = require("../../models/users.model");
 
+const suspiciousUser = async (userChatId, suspicious) => {
+  try {
+    const newData = { ...userChatId, suspicious };
+    const result = await User.updateOne({ userChatId }, newData);
+    if (result.nModified === 0) {
+      return console.log("Пользователь не найден");
+    }
+    console.log("Данные пользователя успешно обновлены");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const sendReplenishment = async (foundUser) => {
-  const caption = ` ТИП ОПЕРАЦИИ: ПОПОЛНЕНИЕ
+  const existingUser = await User.findOne({
+    userChatId: foundUser.chatId,
+  });
+
+  const caption = `${
+    !!existingUser.suspicious ? MESSAGE.SUSPICIOUS : ""
+  }ТИП ОПЕРАЦИИ: ПОПОЛНЕНИЕ
   
 ПОЛЬЗОВАТЕЛЬ - @${foundUser.user}
 ID - ${foundUser.accountId}
@@ -25,7 +44,10 @@ ID - ${foundUser.accountId}
         foundUser.screenshot[0].file_id,
         {
           caption,
-          reply_markup: setAdminOptions(foundUser.chatId).reply_markup,
+          reply_markup: setAdminOptions(
+            foundUser.chatId,
+            !!existingUser.suspicious
+          ).reply_markup,
         }
       );
     } else {
@@ -34,7 +56,10 @@ ID - ${foundUser.accountId}
         foundUser.screenshot.file_id,
         {
           caption,
-          reply_markup: setAdminOptions(foundUser.chatId).reply_markup,
+          reply_markup: setAdminOptions(
+            foundUser.chatId,
+            !!existingUser.suspicious
+          ).reply_markup,
         }
       );
     }
@@ -55,7 +80,12 @@ const getUserChatIdFromAdmin = (str) => {
 };
 
 const sendConclusion = async (foundUser) => {
-  const caption = `ТИП ОПЕРАЦИИ: ВЫВОД
+  const existingUser = await User.findOne({
+    userChatId: foundUser.chatId,
+  });
+  const caption = `${
+    !!existingUser.suspicious ? MESSAGE.SUSPICIOUS : ""
+  }ТИП ОПЕРАЦИИ: ВЫВОД
 
 ПОЛЬЗОВАТЕЛЬ - @${foundUser.user}
 ID - ${foundUser.conclusionAccountId}
@@ -68,7 +98,8 @@ ID - ${foundUser.conclusionAccountId}
     fs.readFileSync("common/assets/images/conclusion.jpg"),
     {
       caption,
-      reply_markup: setAdminOptions(foundUser.chatId).reply_markup,
+      reply_markup: setAdminOptions(foundUser.chatId, !!existingUser.suspicious)
+        .reply_markup,
     }
   );
 };
@@ -132,6 +163,31 @@ const editAdminMessage = async (msg, type) => {
   );
 };
 
+const setSuspiciousText = (text) => {
+  let inputString = text;
+  let searchString = MESSAGE.SUSPICIOUS;
+  let replaceString = "";
+  if (inputString.includes(searchString)) {
+    inputString = inputString.replace(searchString, replaceString);
+  } else {
+    inputString = searchString + "\n" + inputString;
+  }
+  return inputString;
+};
+
+const editAdmiMessageAfterSuspicious = async (msg, type) => {
+  const admin_chat_id = msg.message.chat.id;
+  const message_id = msg.message.message_id;
+  const message_caption = setSuspiciousText(msg.message.caption);
+  const user_chat_Id = getUserChatIdFromAdmin(msg.data);
+  await suspiciousUser(user_chat_Id, type);
+  return bot.editMessageCaption(message_caption, {
+    chat_id: admin_chat_id,
+    message_id,
+    reply_markup: setAdminOptions(user_chat_Id, type).reply_markup,
+  });
+};
+
 const subscribeToChannel = (chatId) => {
   bot.getChat(targetChannelId).then((channel) => {
     bot.sendMessage(
@@ -165,7 +221,7 @@ const sendUserChatId = async (userChatId) => {
       userChatId,
     });
     if (!existingUser) {
-      const newUser = await User.create({ userChatId });
+      const newUser = await User.create({ userChatId, suspicious: false });
       return newUser;
     }
     return "такой пользователь уже есть";
@@ -193,4 +249,6 @@ module.exports = {
   subscribeToChannel,
   sendUserChatId,
   getUsers,
+  suspiciousUser,
+  editAdmiMessageAfterSuspicious,
 };

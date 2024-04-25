@@ -5,6 +5,9 @@ const UsersSchema = mongoose.Schema({
     type: String,
     require: [true, "please enter user's chatId"],
   },
+  suspicious: {
+    type: Boolean,
+  },
 });
 
 const User = mongoose.model("User", UsersSchema);

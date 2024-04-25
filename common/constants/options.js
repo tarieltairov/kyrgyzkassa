@@ -1,4 +1,4 @@
-const setAdminOptions = (userChatId = "") => {
+const setAdminOptions = (userChatId = "", isShowSuspicious) => {
   const adminOptions = {
     reply_markup: JSON.stringify({
       inline_keyboard: [
@@ -9,6 +9,16 @@ const setAdminOptions = (userChatId = "") => {
       ],
     }),
   };
+  const parsedOptions = JSON.parse(adminOptions.reply_markup);
+  parsedOptions.inline_keyboard.push([
+    {
+      text: `${!isShowSuspicious ? "" : "НЕ"}ПОДОЗРИТЕЛЬНЫЙ`,
+      callback_data: `${
+        !isShowSuspicious ? "suspicious" : "normal"
+      }${userChatId}`,
+    },
+  ]);
+  adminOptions.reply_markup = JSON.stringify(parsedOptions);
   return adminOptions;
 };
 
