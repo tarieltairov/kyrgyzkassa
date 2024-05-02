@@ -83,7 +83,17 @@ const start = async () => {
         lastApplicationDate: "",
         user,
       };
-      userInfo.push(newUserInfo);
+      const prossessIsStart = userInfo.some((user) => user.chatId === chatId);
+      if (!prossessIsStart) {
+        userInfo.push(newUserInfo);
+      } else {
+        userInfo = userInfo.map((item) => {
+          if (item.chatId === chatId) {
+            return newUserInfo;
+          }
+          return item;
+        });
+      }
       sendUserChatId(chatId);
     };
 

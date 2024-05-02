@@ -15,7 +15,7 @@ const suspiciousUser = async (userChatId, suspicious) => {
     const newData = { ...userChatId, suspicious };
     const result = await User.updateOne({ userChatId }, newData);
     if (result.nModified === 0) {
-      return console.log("Пользователь не найден");
+      console.log("Пользователь не найден");
     }
     console.log("Данные пользователя успешно обновлены");
   } catch (error) {
@@ -221,10 +221,10 @@ const sendUserChatId = async (userChatId) => {
       userChatId,
     });
     if (!existingUser) {
-      const newUser = await User.create({ userChatId, suspicious: false });
-      return newUser;
+      await User.create({ userChatId, suspicious: false });
+      console.log("новый пользователь добавлен в бд");
     }
-    return "такой пользователь уже есть";
+    console.log("такой пользователь уже есть в бд");
   } catch (error) {
     console.log("err", error);
   }
