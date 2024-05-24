@@ -10,7 +10,7 @@ const REQUISITES = [
   {
     id: "/kairatlogin",
     name: "Кайрат.М",
-    mbank: "+996709050900",
+    mbank: "+996505115720",
     omoney: "0709050900",
     optima: "4169585359474706",
     elcart: "9417568500865625",
@@ -19,7 +19,15 @@ const REQUISITES = [
 
 const setRequisites = (admin) => {
   const currentAdmin = REQUISITES.find((i) => i.id === admin);
-  MESSAGE.REQUISITES = `Отправьте по следующим реквизитам:\n\nMBANK\n${currentAdmin.mbank} (${currentAdmin.name})\n\nО деньги!\n${currentAdmin.omoney} (${currentAdmin.name})\n\nОптима\n${currentAdmin.optima} (${currentAdmin.name})\n\nЭлкарт\n${currentAdmin.elcart} (${currentAdmin.name})\n\nПосле оплаты нажмите на кнопку ниже👇`;
+  MESSAGE.REQUISITES = `Отправьте по следующим реквизитам:\n\nMBANK\n${
+    currentAdmin.mbank
+  } (${
+    currentAdmin.name === "Кайрат.М" ? "Малика К." : currentAdmin.name
+  })\n\nО деньги!\n${currentAdmin.omoney} (${currentAdmin.name})\n\nОптима\n${
+    currentAdmin.optima
+  } (${currentAdmin.name})\n\nЭлкарт\n${currentAdmin.elcart} (${
+    currentAdmin.name
+  })\n\nПосле оплаты нажмите на кнопку ниже👇`;
 };
 
 const MESSAGE = {
