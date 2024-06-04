@@ -9,7 +9,7 @@ const REQUISITES = [
   {
     id: "/kairatlogin",
     name: "Кайрат.М",
-    mbank: "+996703339945",
+    mbank: "+996705090515",
     omoney: "0709050900",
     optima: "4169585359474706",
   },
