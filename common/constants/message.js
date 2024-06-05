@@ -20,7 +20,7 @@ const setRequisites = (admin) => {
   MESSAGE.REQUISITES = `Отправьте по следующим реквизитам:\n\nMBANK\n${
     currentAdmin.mbank
   } (${
-    currentAdmin.name === "Кайрат.М" ? "Омурбек Х." : currentAdmin.name
+    currentAdmin.name === "Кайрат.М" ? "Зуурабубу О." : currentAdmin.name
   })\n\nО деньги!\n${currentAdmin.omoney} (${currentAdmin.name})\n\nОптима\n${
     currentAdmin.optima
   } (${currentAdmin.name})\n\nПосле оплаты нажмите на кнопку ниже👇`;
