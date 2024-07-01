@@ -3,6 +3,7 @@ const commandsValues = {
   cancel: "/cancel",
   aktan: "/aktanlogin",
   kairat: "/kairatlogin",
+  aidai: "/aidailogin",
   botTurnOn: "/turnonbot",
   botTurnOff: "/turnoffbot",
   botIsWorking: "/botworking",
@@ -13,11 +14,9 @@ const btnType = {
   mbank: "mbank",
   omoney: "omoney",
   optima: "optima",
-  elcart: "elcart",
   conclusionMbank: "conclusion_mbank",
   conclusionOmoney: "conclusion_omoney",
   conclusionOptima: "conclusion_optima",
-  conclusionElcart: "conclusion_elcart",
   paid: "paid",
   conclusion: "conclusion",
   accept: "accept",
@@ -31,11 +30,9 @@ const reqMethod = {
   mbank: "Mbank",
   omoney: "О Деньги!",
   optima: "Оптима",
-  elcart: "Элкарт",
   conclusion_mbank: "Mbank",
   conclusion_omoney: "О Деньги!",
   conclusion_optima: "Оптима",
-  conclusion_elcart: "Элкарт",
 };
 
 const commandsBtns = [

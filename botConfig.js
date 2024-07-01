@@ -10,6 +10,7 @@ const conclusionGroupId = process.env.CONCLUSION_GROUP_ID;
 const accessAcconts = {
   aktan: process.env.AKTAN,
   kairat: process.env.KAIRAT,
+  aidai: process.env.AIDAI,
   proger: process.env.PROGER,
 };
 

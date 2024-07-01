@@ -147,7 +147,8 @@ const start = async () => {
                   }
                   if (
                     text === commandsValues.aktan ||
-                    text === commandsValues.kairat
+                    text === commandsValues.kairat ||
+                    text === commandsValues.aidai
                   ) {
                     setRequisites(text);
                     return bot.sendMessage(
@@ -317,8 +318,7 @@ const start = async () => {
         if (
           data === btnType.mbank ||
           data === btnType.omoney ||
-          data === btnType.optima ||
-          data === btnType.elcart
+          data === btnType.optima
         ) {
           foundUser.refillmentMethod = data;
           udpatedSteps(chatId);
@@ -342,8 +342,7 @@ const start = async () => {
         if (
           data === btnType.conclusionMbank ||
           data === btnType.conclusionOmoney ||
-          data === btnType.conclusionOptima ||
-          data === btnType.conclusionElcart
+          data === btnType.conclusionOptima
         ) {
           foundUser.conlusionRefillmentMethod = data;
           udpatedSteps(chatId, 5);
