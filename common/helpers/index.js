@@ -9,6 +9,7 @@ const { MESSAGE } = require("../constants/message");
 const { setAdminOptions } = require("../constants/options");
 const fs = require("fs");
 const User = require("../../models/users.model");
+const Requisite = require("../../models/requisites.model");
 
 const suspiciousUser = async (userChatId, suspicious) => {
   try {
@@ -239,6 +240,24 @@ const getUsers = async () => {
   }
 };
 
+const sendAdminReqId = async (reqId) => {
+  try {
+    const get = await Requisite.find({});
+    await Requisite.updateOne({ reqId: get[0].reqId }, { reqId });
+  } catch (error) {
+    console.log("err", error);
+  }
+};
+
+const getCurrentReqId = async () => {
+  try {
+    const check = await Requisite.find({});
+    return check[0].reqId;
+  } catch (error) {
+    console.log("err", error);
+  }
+};
+
 module.exports = {
   sendConclusion,
   sendReplenishment,
@@ -251,4 +270,6 @@ module.exports = {
   getUsers,
   suspiciousUser,
   editAdmiMessageAfterSuspicious,
+  sendAdminReqId,
+  getCurrentReqId,
 };

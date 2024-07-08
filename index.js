@@ -36,6 +36,8 @@ const {
   sendUserChatId,
   getUsers,
   editAdmiMessageAfterSuspicious,
+  sendAdminReqId,
+  getCurrentReqId,
 } = require("./common/helpers");
 const { userStatusbyChannel } = require("./common/constants/other");
 const mongoose = require("mongoose");
@@ -150,7 +152,7 @@ const start = async () => {
                     text === commandsValues.kairat ||
                     text === commandsValues.aidai
                   ) {
-                    setRequisites(text);
+                    await sendAdminReqId(text);
                     return bot.sendMessage(
                       chatId,
                       `Реквизиты изменены на ваши ${
@@ -208,6 +210,8 @@ const start = async () => {
                   ) {
                     foundUser.accountId = text;
                     foundUser.isFullAccountId = true;
+                    const currentAdminReqId = await getCurrentReqId();
+                    setRequisites(currentAdminReqId);
                     return bot.sendMessage(
                       chatId,
                       MESSAGE.REQUISITES,
@@ -228,6 +232,8 @@ const start = async () => {
                     }
                   }
                   if (!foundUser.isPaid && foundUser.currentStep === 2) {
+                    const currentAdminReqId = await getCurrentReqId();
+                    setRequisites(currentAdminReqId);
                     return bot.sendMessage(
                       chatId,
                       MESSAGE.REQUISITES,
