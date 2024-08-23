@@ -4,6 +4,7 @@ const commandsValues = {
   aktan: "/aktanlogin",
   kairat: "/kairatlogin",
   aidai: "/aidailogin",
+  kydyr: "/kydyrlogin",
   botTurnOn: "/turnonbot",
   botTurnOff: "/turnoffbot",
   botIsWorking: "/botworking",

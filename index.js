@@ -150,7 +150,8 @@ const start = async () => {
                   if (
                     text === commandsValues.aktan ||
                     text === commandsValues.kairat ||
-                    text === commandsValues.aidai
+                    text === commandsValues.aidai ||
+                    text === commandsValues.kydyr
                   ) {
                     await sendAdminReqId(text);
                     return bot.sendMessage(
