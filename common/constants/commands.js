@@ -12,10 +12,10 @@ const commandsValues = {
 
 const btnType = {
   replacement: "replacement",
-  mbank: "mbank",
+  kompanion: "kompanion",
   omoney: "omoney",
   optima: "optima",
-  conclusionMbank: "conclusion_mbank",
+  conclusionKompanion: "conclusion_kompanion",
   conclusionOmoney: "conclusion_omoney",
   conclusionOptima: "conclusion_optima",
   paid: "paid",
@@ -28,10 +28,10 @@ const btnType = {
 };
 
 const reqMethod = {
-  mbank: "Mbank",
+  kompanion: "Компаньон",
   omoney: "О Деньги!",
   optima: "Оптима",
-  conclusion_mbank: "Mbank",
+  conclusion_kompanion: "Компаньон",
   conclusion_omoney: "О Деньги!",
   conclusion_optima: "Оптима",
 };
