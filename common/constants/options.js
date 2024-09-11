@@ -26,10 +26,13 @@ const conclusionOptions = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
       [
-        { text: "О Деньги!", callback_data: "conclusion_omoney" },
+        { text: "Бакай", callback_data: "conclusion_bakai" },
         { text: "Компаньон", callback_data: "conclusion_kompanion" },
       ],
-      [{ text: "Оптима", callback_data: "conclusion_optima" }],
+      [
+        { text: "Оптима", callback_data: "conclusion_optima" },
+        { text: "Mbank", callback_data: "conclusion_mbank" },
+      ],
     ],
   }),
 };
@@ -38,10 +41,13 @@ const replacementOptions = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
       [
-        { text: "О Деньги!", callback_data: "omoney" },
+        { text: "Бакай", callback_data: "bakai" },
         { text: "Компаньон", callback_data: "kompanion" },
       ],
-      [{ text: "Оптима", callback_data: "optima" }],
+      [
+        { text: "Оптима", callback_data: "optima" },
+        { text: "Mbank", callback_data: "mbank" },
+      ],
     ],
   }),
 };

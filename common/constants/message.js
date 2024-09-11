@@ -3,35 +3,39 @@ const REQUISITES = [
     id: "/aktanlogin",
     name: "Актан",
     kompanion: "+996503120440 (Актан К.)",
-    omoney: "0503120440 (Актан К.)",
+    bakai: "0503120440 (Актан К.)",
     optima: "4169585354555541 (Актан К.)",
+    mbank: "0705090515 (Зуурабубу)",
   },
   {
     id: "/kairatlogin",
     name: "Кайрат",
     kompanion: "+996500047902 (Кайрат М.)",
-    omoney: "0500047902 (Кайрат М.)",
+    bakai: "0500047902 (Кайрат М.)",
     optima: "4169585359474706 (Кайрат М.)",
+    mbank: "0500047902 (Марат Д.)",
   },
   {
     id: "/aidailogin",
     name: "Айдай",
     kompanion: "+996709050900 (Малика К.)",
-    omoney: "0709050900 (Кайрат М.)",
+    bakai: "------",
     optima: "4169585358886124 (К.М.К)",
+    mbank: "------",
   },
   {
     id: "/kydyrlogin",
     name: "Кыдыр",
-    kompanion: "+996555770963 (Кыдыр Т.)",
-    omoney: "0709535053 (Кыдыр Т.)",
+    kompanion: "------",
+    bakai: "------",
     optima: "4169585353042293 (Т.У.К.)",
+    mbank: "0555770963 (Кыдыр Т.)",
   },
 ];
 
 const setRequisites = (admin) => {
   const currentAdmin = REQUISITES.find((i) => i.id === admin);
-  MESSAGE.REQUISITES = `Отправьте по следующим реквизитам:\n\nКомпаньон\n${currentAdmin.kompanion}\n\nО деньги!\n${currentAdmin.omoney}\n\nОптима\n${currentAdmin.optima}\n\nПосле оплаты нажмите на кнопку ниже👇`;
+  MESSAGE.REQUISITES = `Отправьте по следующим реквизитам:\n\nКомпаньон\n${currentAdmin.kompanion}\n\nБакай\n${currentAdmin.bakai}\n\nОптима\n${currentAdmin.optima}\n\nMbank\n${currentAdmin.mbank}\n\nПосле оплаты нажмите на кнопку ниже👇`;
 };
 
 const MESSAGE = {
