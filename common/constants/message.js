@@ -2,7 +2,7 @@ const REQUISITES = [
   {
     id: "/aktanlogin",
     name: "Актан",
-    kompanion: "+996503120440 (Актан К.)",
+    kompanion: "------",
     bakai: "0503120440 (Актан К.)",
     optima: "4169585354555541 (Актан К.)",
     mbank: "0507259037 (Махабат И.)",
@@ -10,7 +10,7 @@ const REQUISITES = [
   {
     id: "/kairatlogin",
     name: "Кайрат",
-    kompanion: "+996500047902 (Кайрат М.)",
+    kompanion: "------",
     bakai: "0500047902 (Кайрат М.)",
     optima: "4169585359474706 (Кайрат М.)",
     mbank: "0500047902 (Марат Д.)",
