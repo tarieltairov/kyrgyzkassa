@@ -18,10 +18,10 @@ const REQUISITES = [
   {
     id: "/aidailogin",
     name: "Айдай",
-    kompanion: "+996709050900 (Малика К.)",
+    kompanion: "------",
     bakai: "0503120440 (Актан К.)",
     optima: "4169585358886124 (К.М.К)",
-    mbank: "0550018102 (Урзыйпа К.)",
+    mbank: "0500056045 (Кылычбек А.)",
   },
   {
     id: "/kydyrlogin",
