@@ -5,7 +5,7 @@ const REQUISITES = [
     kompanion: "------",
     bakai: "0503120440 (Актан К.)",
     optima: "9417748579984230 (К. А. М.)",
-    mbank: "0507259532 (Айнура И.)",
+    mbank: "0507693712 (Адилет С.)",
   },
   {
     id: "/kairatlogin",
