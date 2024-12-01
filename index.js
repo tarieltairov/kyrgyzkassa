@@ -323,7 +323,7 @@ const start = async () => {
         }
 
         if (
-          data === btnType.kompanion ||
+          data === btnType.omoney ||
           data === btnType.bakai ||
           data === btnType.optima ||
           data === btnType.mbank
@@ -348,7 +348,7 @@ const start = async () => {
         }
 
         if (
-          data === btnType.conclusionKompanion ||
+          data === btnType.conclusionOmoney ||
           data === btnType.conclusionBakai ||
           data === btnType.conclusionOptima ||
           data === btnType.conclusionMbank

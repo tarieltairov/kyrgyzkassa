@@ -27,7 +27,7 @@ const conclusionOptions = {
     inline_keyboard: [
       [
         { text: "Бакай", callback_data: "conclusion_bakai" },
-        { text: "Компаньон", callback_data: "conclusion_kompanion" },
+        { text: "О деньги", callback_data: "conclusion_omoney" },
       ],
       [
         { text: "Оптима", callback_data: "conclusion_optima" },
@@ -42,7 +42,7 @@ const replacementOptions = {
     inline_keyboard: [
       [
         { text: "Бакай", callback_data: "bakai" },
-        { text: "Компаньон", callback_data: "kompanion" },
+        { text: "О деньги", callback_data: "omoney" },
       ],
       [
         { text: "Оптима", callback_data: "optima" },
