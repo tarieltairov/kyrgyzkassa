@@ -8,6 +8,7 @@ const commandsValues = {
   botTurnOn: "/turnonbot",
   botTurnOff: "/turnoffbot",
   botIsWorking: "/botworking",
+  bonusActivate: "/bonusactivate",
 };
 
 const btnType = {

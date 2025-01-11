@@ -175,6 +175,21 @@ const start = async () => {
                       return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
                     }
                   }
+
+                  if (text === commandsValues.bonusActivate) {
+                    const res = await getUsers();
+                    if (res.length) {
+                      return res.forEach((user) => {
+                        bot.sendMessage(
+                          user.userChatId,
+                          MESSAGE.BONUS_ACTIVATE
+                        );
+                      });
+                    } else {
+                      await bot.sendMessage(chatId, MESSAGE.EMPTY_DB);
+                      return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
+                    }
+                  }
                 }
 
                 if (text === commandsValues.cancel) {
