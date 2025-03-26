@@ -12,7 +12,7 @@ const REQUISITES = [
     name: "Кайрат",
     omoney: "0500047902 (Кайрат М.)",
     bakai: "------",
-    optima: "0500047902 (К.Н.)",
+    optima: "------",
     mbank: "------",
   },
   {
