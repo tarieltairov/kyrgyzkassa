@@ -18,7 +18,7 @@ const REQUISITES = [
   {
     id: "/aidailogin",
     name: "Айдай",
-    omoney: "0500064214 (Хангелди)",
+    omoney: "------",
     bakai: "------",
     optima: "------",
     mbank: "0507693712 (Адилет)",
