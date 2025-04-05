@@ -5,7 +5,7 @@ const REQUISITES = [
     omoney: "0503120440 (Актан К.)",
     bakai: "------",
     optima: "4169585354505884 (Кылычбек А.)",
-    mbank: "------",
+    mbank: "0998989166 (Нурбол Т.)",
   },
   {
     id: "/kairatlogin",
