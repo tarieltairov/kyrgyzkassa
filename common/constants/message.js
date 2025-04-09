@@ -2,18 +2,18 @@ const REQUISITES = [
   {
     id: "/aktanlogin",
     name: "Актан",
-    omoney: "------",
+    omoney: "0505226633 (Нурсултан Ж.)",
     bakai: "------",
     optima: "------",
-    mbank: "0998989166 (Нурбол Т.)",
+    mbank: "-------",
   },
   {
     id: "/kairatlogin",
     name: "Кайрат",
     omoney: "0706518080  (Наргиза К.)",
-    bakai: "070855233 (Чысгызхан.С)",
+    bakai: "070855233 (Чынгызхан.С)",
     optima: "------",
-    mbank: "0507751268 (Кубанычбек С.)",
+    mbank: "------",
   },
   {
     id: "/aidailogin",
@@ -21,15 +21,15 @@ const REQUISITES = [
     omoney: "------",
     bakai: "------",
     optima: "------",
-    mbank: "0507693712 (Адилет)",
+    mbank: "-------",
   },
   {
     id: "/kydyrlogin",
     name: "Кыдыр",
     omoney: "------",
     bakai: "------",
-    optima: "4169585353042293 (Т.У.К.)",
-    mbank: "0555770963 (Кыдыр Т.)",
+    optima: "------",
+    mbank: "------",
   },
 ];
 
