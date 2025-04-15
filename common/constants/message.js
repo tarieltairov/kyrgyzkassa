@@ -26,10 +26,10 @@ const REQUISITES = [
   {
     id: "/kydyrlogin",
     name: "Кыдыр",
-    omoney: "------",
+    omoney: "0501144985 (Мырза Ж.)",
     bakai: "------",
     optima: "------",
-    mbank: "------",
+    mbank: "0995102430 (Мырза Ж.)",
   },
 ];
 
