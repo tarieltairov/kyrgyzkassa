@@ -2,7 +2,7 @@ const REQUISITES = [
   {
     id: "/aktanlogin",
     name: "Актан",
-    omoney: "0505226633 (Нурсултан Ж.)",
+    omoney: "0700015403 (Актан K.)",
     bakai: "------",
     optima: "------",
     mbank: "-------",
