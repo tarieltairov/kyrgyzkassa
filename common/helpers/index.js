@@ -71,7 +71,7 @@ ID - ${foundUser.accountId}
 
 const checkNeedSum = (str) => {
   const checkFullNumber = /^\d+$/.test(str);
-  if (checkFullNumber) return Number(str) >= 50;
+  if (checkFullNumber) return Number(str) >= 300;
   return false;
 };
 
