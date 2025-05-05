@@ -32,7 +32,7 @@ const {
   sendConclusion,
   sendReplenishment,
   editAdminMessage,
-  subscribeToChannel,
+  // subscribeToChannel,
   sendUserChatId,
   getUsers,
   editAdmiMessageAfterSuspicious,
@@ -134,173 +134,157 @@ const start = async () => {
       bot
         .getChatMember(targetChannelId, msg.from.id)
         .then(async (chatMember) => {
-          if (chatMember.status === userStatusbyChannel.left) {
-            return subscribeToChannel(chatId, targetChannelId);
-          } else {
-            if (isBotActive) {
-              if (isNotAdminGroups) {
-                if (isAccessAccount) {
-                  if (text === commandsValues.botTurnOn) {
-                    return bot.sendMessage(chatId, MESSAGE.BOT_ON_YET);
-                  }
-                  if (text === commandsValues.botTurnOff) {
-                    turnOffBot();
-                    return bot.sendMessage(chatId, MESSAGE.BOT_OFF);
-                  }
-                  if (
-                    text === commandsValues.aktan ||
-                    text === commandsValues.kairat ||
-                    text === commandsValues.aidai ||
-                    text === commandsValues.kydyr
-                  ) {
-                    await sendAdminReqId(text);
-                    return bot.sendMessage(
-                      chatId,
-                      `Реквизиты изменены на ваши ${
-                        REQUISITES.find((i) => i.id === text).name
-                      }`
-                    );
-                  }
-                  if (text === commandsValues.botIsWorking) {
-                    const res = await getUsers();
-                    if (res.length) {
-                      return res.forEach((user) => {
-                        bot.sendMessage(
-                          user.userChatId,
-                          MESSAGE.BOT_IS_WORKING
-                        );
-                      });
-                    } else {
-                      await bot.sendMessage(chatId, MESSAGE.EMPTY_DB);
-                      return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
-                    }
-                  }
-
-                  if (text === commandsValues.bonusActivate) {
-                    const res = await getUsers();
-                    if (res.length) {
-                      return res.forEach((user) => {
-                        bot.sendMessage(
-                          user.userChatId,
-                          MESSAGE.BONUS_ACTIVATE
-                        );
-                      });
-                    } else {
-                      await bot.sendMessage(chatId, MESSAGE.EMPTY_DB);
-                      return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
-                    }
+          // Логика проверки подписки на канал
+          // if (chatMember.status === userStatusbyChannel.left) {
+          //   return subscribeToChannel(chatId, targetChannelId);
+          // } else {
+          if (isBotActive) {
+            if (isNotAdminGroups) {
+              if (isAccessAccount) {
+                if (text === commandsValues.botTurnOn) {
+                  return bot.sendMessage(chatId, MESSAGE.BOT_ON_YET);
+                }
+                if (text === commandsValues.botTurnOff) {
+                  turnOffBot();
+                  return bot.sendMessage(chatId, MESSAGE.BOT_OFF);
+                }
+                if (
+                  text === commandsValues.aktan ||
+                  text === commandsValues.kairat ||
+                  text === commandsValues.aidai ||
+                  text === commandsValues.kydyr
+                ) {
+                  await sendAdminReqId(text);
+                  return bot.sendMessage(
+                    chatId,
+                    `Реквизиты изменены на ваши ${
+                      REQUISITES.find((i) => i.id === text).name
+                    }`
+                  );
+                }
+                if (text === commandsValues.botIsWorking) {
+                  const res = await getUsers();
+                  if (res.length) {
+                    return res.forEach((user) => {
+                      bot.sendMessage(user.userChatId, MESSAGE.BOT_IS_WORKING);
+                    });
+                  } else {
+                    await bot.sendMessage(chatId, MESSAGE.EMPTY_DB);
+                    return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
                   }
                 }
 
-                if (text === commandsValues.cancel) {
-                  return cancel(chatId);
+                if (text === commandsValues.bonusActivate) {
+                  const res = await getUsers();
+                  if (res.length) {
+                    return res.forEach((user) => {
+                      bot.sendMessage(user.userChatId, MESSAGE.BONUS_ACTIVATE);
+                    });
+                  } else {
+                    await bot.sendMessage(chatId, MESSAGE.EMPTY_DB);
+                    return bot.sendMessage(chatId, MESSAGE.BOT_IS_WORKING);
+                  }
                 }
+              }
 
-                if (text === commandsValues.start) {
-                  await addNewUser(chatId, userName);
-                  return bot.sendMessage(chatId, MESSAGE.START, startOptions);
-                }
+              if (text === commandsValues.cancel) {
+                return cancel(chatId);
+              }
 
-                const foundUser = userInfo.find(
-                  (item) => item.chatId === chatId
-                );
+              if (text === commandsValues.start) {
+                await addNewUser(chatId, userName);
+                return bot.sendMessage(chatId, MESSAGE.START, startOptions);
+              }
 
-                if (foundUser) {
-                  if (foundUser.currentStep === 1) {
-                    if (checkNeedSum(text)) {
-                      foundUser.replenishmentAmount = text;
-                      await udpatedSteps(chatId);
-                      return bot.sendPhoto(
-                        chatId,
-                        fs.readFileSync("common/assets/images/photo.jpg"),
-                        { caption: MESSAGE.ACCOUNT_ID }
-                      );
-                    } else {
-                      return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
-                    }
-                  }
+              const foundUser = userInfo.find((item) => item.chatId === chatId);
 
-                  if (
-                    foundUser.currentStep === 2 &&
-                    !foundUser.isFullAccountId
-                  ) {
-                    foundUser.accountId = text;
-                    foundUser.isFullAccountId = true;
-                    const currentAdminReqId = await getCurrentReqId();
-                    setRequisites(currentAdminReqId);
-                    return bot.sendMessage(
-                      chatId,
-                      MESSAGE.REQUISITES,
-                      paymentOptions
-                    );
-                  }
-
-                  if (foundUser.currentStep === 3) {
-                    if ("document" in msg || "photo" in msg) {
-                      foundUser.screenshot = msg.document || msg.photo;
-                      await bot.sendMessage(
-                        chatId,
-                        MESSAGE.APPLICATION_ACCEPTED
-                      );
-                      return sendUserInfoToOut(foundUser);
-                    } else {
-                      return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
-                    }
-                  }
-                  if (!foundUser.isPaid && foundUser.currentStep === 2) {
-                    const currentAdminReqId = await getCurrentReqId();
-                    setRequisites(currentAdminReqId);
-                    return bot.sendMessage(
-                      chatId,
-                      MESSAGE.REQUISITES,
-                      paymentOptions
-                    );
-                  }
-                  if (foundUser.currentStep === 5) {
-                    foundUser.conclusionRequisites = text;
-                    udpatedSteps(chatId);
+              if (foundUser) {
+                if (foundUser.currentStep === 1) {
+                  if (checkNeedSum(text)) {
+                    foundUser.replenishmentAmount = text;
+                    await udpatedSteps(chatId);
                     return bot.sendPhoto(
                       chatId,
                       fs.readFileSync("common/assets/images/photo.jpg"),
                       { caption: MESSAGE.ACCOUNT_ID }
                     );
-                  }
-                  if (foundUser.currentStep === 6) {
-                    foundUser.conclusionAccountId = text;
-                    udpatedSteps(chatId);
-                    await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
-                    return bot.sendMessage(chatId, MESSAGE.CODE);
-                  }
-                  if (foundUser.currentStep === 7) {
-                    foundUser.conclusionCode = text;
-                    udpatedSteps(chatId);
-                    return bot.sendMessage(
-                      chatId,
-                      MESSAGE.CONCLUSION_SUM_RULES
-                    );
-                  }
-                  if (foundUser.currentStep === 8) {
-                    foundUser.conlusionAmount = text;
-                    await bot.sendMessage(chatId, MESSAGE.CONCLUSION_ACCEPTED);
-                    return sendConclusionUserInfo(foundUser);
+                  } else {
+                    return bot.sendMessage(chatId, MESSAGE.SUM_RULES);
                   }
                 }
 
-                return bot.sendMessage(chatId, MESSAGE.WRONG);
-              }
-            } else {
-              if (isAccessAccount) {
-                if (text === commandsValues.botTurnOn) {
-                  turnOnBot();
-                  return bot.sendMessage(chatId, MESSAGE.BOT_ON);
+                if (foundUser.currentStep === 2 && !foundUser.isFullAccountId) {
+                  foundUser.accountId = text;
+                  foundUser.isFullAccountId = true;
+                  const currentAdminReqId = await getCurrentReqId();
+                  setRequisites(currentAdminReqId);
+                  return bot.sendMessage(
+                    chatId,
+                    MESSAGE.REQUISITES,
+                    paymentOptions
+                  );
                 }
-                if (text === commandsValues.botTurnOff) {
-                  return bot.sendMessage(chatId, MESSAGE.BOT_OFF_YET);
+
+                if (foundUser.currentStep === 3) {
+                  if ("document" in msg || "photo" in msg) {
+                    foundUser.screenshot = msg.document || msg.photo;
+                    await bot.sendMessage(chatId, MESSAGE.APPLICATION_ACCEPTED);
+                    return sendUserInfoToOut(foundUser);
+                  } else {
+                    return bot.sendMessage(chatId, MESSAGE.SCREENSHOT);
+                  }
+                }
+                if (!foundUser.isPaid && foundUser.currentStep === 2) {
+                  const currentAdminReqId = await getCurrentReqId();
+                  setRequisites(currentAdminReqId);
+                  return bot.sendMessage(
+                    chatId,
+                    MESSAGE.REQUISITES,
+                    paymentOptions
+                  );
+                }
+                if (foundUser.currentStep === 5) {
+                  foundUser.conclusionRequisites = text;
+                  udpatedSteps(chatId);
+                  return bot.sendPhoto(
+                    chatId,
+                    fs.readFileSync("common/assets/images/photo.jpg"),
+                    { caption: MESSAGE.ACCOUNT_ID }
+                  );
+                }
+                if (foundUser.currentStep === 6) {
+                  foundUser.conclusionAccountId = text;
+                  udpatedSteps(chatId);
+                  await bot.sendMessage(chatId, MESSAGE.CODE_INSTRUCTION);
+                  return bot.sendMessage(chatId, MESSAGE.CODE);
+                }
+                if (foundUser.currentStep === 7) {
+                  foundUser.conclusionCode = text;
+                  udpatedSteps(chatId);
+                  return bot.sendMessage(chatId, MESSAGE.CONCLUSION_SUM_RULES);
+                }
+                if (foundUser.currentStep === 8) {
+                  foundUser.conlusionAmount = text;
+                  await bot.sendMessage(chatId, MESSAGE.CONCLUSION_ACCEPTED);
+                  return sendConclusionUserInfo(foundUser);
                 }
               }
-              return bot.sendMessage(chatId, MESSAGE.BOT_OFF_CLIENT);
+
+              return bot.sendMessage(chatId, MESSAGE.WRONG);
             }
+          } else {
+            if (isAccessAccount) {
+              if (text === commandsValues.botTurnOn) {
+                turnOnBot();
+                return bot.sendMessage(chatId, MESSAGE.BOT_ON);
+              }
+              if (text === commandsValues.botTurnOff) {
+                return bot.sendMessage(chatId, MESSAGE.BOT_OFF_YET);
+              }
+            }
+            return bot.sendMessage(chatId, MESSAGE.BOT_OFF_CLIENT);
           }
+          // }
         });
     });
 
@@ -309,19 +293,19 @@ const start = async () => {
       const chatId = msg.message.chat.id;
       const messageId = msg.message.message_id;
       const foundUser = userInfo.find((item) => item.chatId === chatId);
-
-      if (data === btnType.startAfterSubscribe) {
-        bot
-          .getChatMember(targetChannelId, msg.from.id)
-          .then(async (chatMember) => {
-            await bot.deleteMessage(chatId, messageId);
-            if (chatMember.status === userStatusbyChannel.left) {
-              return subscribeToChannel(chatId, targetChannelId);
-            } else {
-              return bot.sendMessage(chatId, MESSAGE.YOU_ARE_SUBSCRIBED);
-            }
-          });
-      }
+      // Логика проверки подписки на канал после нажатия кнопки "Подписался"
+      // if (data === btnType.startAfterSubscribe) {
+      //   bot
+      //     .getChatMember(targetChannelId, msg.from.id)
+      //     .then(async (chatMember) => {
+      //       await bot.deleteMessage(chatId, messageId);
+      //       if (chatMember.status === userStatusbyChannel.left) {
+      //         return subscribeToChannel(chatId, targetChannelId);
+      //       } else {
+      //         return bot.sendMessage(chatId, MESSAGE.YOU_ARE_SUBSCRIBED);
+      //       }
+      //     });
+      // }
 
       if (foundUser) {
         if (!isBotActive) {
